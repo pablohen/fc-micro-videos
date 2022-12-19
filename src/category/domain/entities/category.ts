@@ -1,4 +1,4 @@
-import { v4 as uuidV4 } from "uuid";
+import { UniqueEntityId } from "../../../@seedwork/domain/unique-entity-id.vo";
 
 export interface Props {
   name: string;
@@ -8,10 +8,10 @@ export interface Props {
 }
 
 export class Category {
-  public readonly id: string;
+  public readonly id: UniqueEntityId;
 
-  constructor(public readonly props: Props, id?: string) {
-    this.id = id || uuidV4();
+  constructor(public readonly props: Props, id?: UniqueEntityId) {
+    this.id = id || new UniqueEntityId();
     this.props.description = this.props.description ?? null;
     this.props.is_active = this.props.is_active ?? true;
     this.props.created_at = this.props.created_at ?? new Date();

@@ -1,10 +1,10 @@
 import { omit } from "lodash";
-import { v4 as uuidV4, validate as uuidValidate } from "uuid";
+import { UniqueEntityId } from "../../../@seedwork/domain/unique-entity-id.vo";
 import { Category, Props } from "./category";
 
 interface CategoryData {
   props: Props;
-  id?: string;
+  id?: UniqueEntityId;
 }
 
 describe("Category Unit Tests", () => {
@@ -84,14 +84,14 @@ describe("Category Unit Tests", () => {
       },
       {
         props: { name: "Movie" },
-        id: uuidV4(),
+        id: new UniqueEntityId(),
       },
     ];
 
     data.forEach((item) => {
       let category = new Category(item.props, item.id);
       expect(category.id).not.toBeNull();
-      expect(uuidValidate(category.id)).toBeTruthy();
+      expect(category.id).toBeInstanceOf(UniqueEntityId);
     });
   });
   test("should have valid name", () => {
