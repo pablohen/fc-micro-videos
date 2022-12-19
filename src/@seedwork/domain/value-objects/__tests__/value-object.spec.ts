@@ -1,3 +1,4 @@
+import { deepFreeze } from "../../../../@seedwork/domain/utils/object";
 import { ValueObject } from "../value-object";
 
 class StubValueObject extends ValueObject {}
@@ -16,8 +17,6 @@ describe("ValueObject Unit Tests", () => {
   test("should convert to string", () => {
     const date = new Date();
     const arrange = [
-      { received: null, expected: "null" },
-      { received: undefined, expected: "undefined" },
       { received: "", expected: "" },
       { received: "fake test", expected: "fake test" },
       { received: 0, expected: "0" },
@@ -37,5 +36,22 @@ describe("ValueObject Unit Tests", () => {
       let vo = new StubValueObject(item.received);
       expect(vo + "").toBe(item.expected);
     });
+  });
+
+  test("should be immutable", () => {
+    const obj = deepFreeze({
+      prop1: "value 1",
+      deep: { prop2: "value 2", prop3: new Date() },
+    });
+
+    const vo = new StubValueObject(obj);
+
+    expect(() => ((vo as any).value.prop1 = "test 1")).toThrow(
+      "Cannot assign to read only property 'prop1' of object '#<Object>'"
+    );
+    expect(() => ((vo as any).value.deep.prop2 = "test 2")).toThrow(
+      "Cannot assign to read only property 'prop2' of object '#<Object>'"
+    );
+    expect(vo.value.deep.prop3).toBeInstanceOf(Date);
   });
 });
