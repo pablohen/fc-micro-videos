@@ -153,4 +153,34 @@ describe("Category Unit Tests", () => {
     });
     expect(category.created_at).toBe(created_at);
   });
+
+  test("should update a category", () => {
+    let category = new Category({
+      name: "Movie",
+    });
+    expect(category.name).toBe("Movie");
+
+    category.update({ name: "Updated Movie", description: "" });
+    expect(category.name).toBe("Updated Movie");
+
+    category.update({
+      name: "Updated Movie 2",
+      description: "updated description",
+    });
+    expect(category.name).toBe("Updated Movie 2");
+    expect(category.description).toBe("updated description");
+  });
+
+  test("should disable and enable a category", () => {
+    const category = new Category({
+      name: "Movie",
+    });
+    expect(category.is_active).toBeTruthy();
+
+    category.deactivate();
+    expect(category.is_active).toBeFalsy();
+
+    category.activate();
+    expect(category.is_active).toBeTruthy();
+  });
 });

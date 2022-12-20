@@ -8,6 +8,8 @@ export interface Props {
   created_at?: Date;
 }
 
+type Update = Pick<Required<Props>, "name" | "description">;
+
 export class Category extends Entity<Props> {
   constructor(public readonly props: Props, id?: UniqueEntityId) {
     super(props, id);
@@ -18,6 +20,10 @@ export class Category extends Entity<Props> {
 
   get name() {
     return this.props.name;
+  }
+
+  private set name(value: string) {
+    this.props.name = value;
   }
 
   get description() {
@@ -38,5 +44,18 @@ export class Category extends Entity<Props> {
 
   get created_at() {
     return this.props.created_at;
+  }
+
+  update({ name, description }: Update) {
+    this.name = name;
+    this.description = description;
+  }
+
+  activate() {
+    this.props.is_active = true;
+  }
+
+  deactivate() {
+    this.props.is_active = false;
   }
 }
