@@ -8,11 +8,16 @@ interface CategoryData {
 }
 
 describe("Category Unit Tests", () => {
+  beforeEach(() => {
+    Category.validate = jest.fn();
+  });
+
   test("should have valid Category data", () => {
     let category = new Category({ name: "Movie" });
 
     let props = omit(category.props, "created_at");
 
+    expect(Category.validate).toHaveBeenCalled();
     expect(props).toStrictEqual({
       name: "Movie",
       description: null,
@@ -158,15 +163,18 @@ describe("Category Unit Tests", () => {
     let category = new Category({
       name: "Movie",
     });
+    expect(Category.validate).toHaveBeenCalledTimes(1);
     expect(category.name).toBe("Movie");
 
     category.update({ name: "Updated Movie", description: "" });
+    expect(Category.validate).toHaveBeenCalledTimes(2);
     expect(category.name).toBe("Updated Movie");
 
     category.update({
       name: "Updated Movie 2",
       description: "updated description",
     });
+    expect(Category.validate).toHaveBeenCalledTimes(3);
     expect(category.name).toBe("Updated Movie 2");
     expect(category.description).toBe("updated description");
   });
