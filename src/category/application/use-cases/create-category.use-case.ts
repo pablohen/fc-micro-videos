@@ -1,3 +1,4 @@
+import { UseCase } from "../../../@seedwork/application/use-case";
 import { Category } from "../../../category/domain/entities/category";
 import { CategoryRepository } from "../../../category/domain/repository/category.repository";
 import { CategoryOutput } from "../dto/category-output.dto";
@@ -7,11 +8,12 @@ export interface Input {
   description?: string;
   is_active?: boolean;
 }
+type Output = CategoryOutput;
 
-export class CreateCategoryUseCase {
+export class CreateCategoryUseCase implements UseCase<Input, Output> {
   constructor(private categoryRepository: CategoryRepository.Repository) {}
 
-  async execute(input: Input): Promise<CategoryOutput> {
+  async execute(input: Input): Promise<Output> {
     const entity = new Category(input);
     await this.categoryRepository.insert(entity);
 
