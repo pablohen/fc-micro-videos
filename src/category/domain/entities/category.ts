@@ -3,17 +3,17 @@ import { EntityValidationError } from "../../../@seedwork/domain/errors/validati
 import { UniqueEntityId } from "../../../@seedwork/domain/value-objects/unique-entity-id.vo";
 import { CategoryValidatorFactory } from "../validators/category-validator";
 
-export interface Props {
+export interface CategoryProps {
   name: string;
   description?: string;
   is_active?: boolean;
   created_at?: Date;
 }
 
-type Update = Pick<Required<Props>, "name" | "description">;
+type Update = Pick<Required<CategoryProps>, "name" | "description">;
 
-export class Category extends Entity<Props> {
-  constructor(public readonly props: Props, id?: UniqueEntityId) {
+export class Category extends Entity<CategoryProps> {
+  constructor(public readonly props: CategoryProps, id?: UniqueEntityId) {
     Category.validate(props);
 
     super(props, id);
@@ -60,7 +60,7 @@ export class Category extends Entity<Props> {
     this.description = description;
   }
 
-  static validate(props: Omit<Props, "created_at">) {
+  static validate(props: Omit<CategoryProps, "created_at">) {
     const validator = CategoryValidatorFactory.create();
     const isValid = validator.validate(props);
 
@@ -69,7 +69,7 @@ export class Category extends Entity<Props> {
     }
   }
 
-  // static validate(props: Omit<Props, "created_at">) {
+  // static validate(props: Omit<CategoryProps, "created_at">) {
   //   ValidatorRules.values(props.name, "name")
   //     .required()
   //     .string()

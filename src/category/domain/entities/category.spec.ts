@@ -1,9 +1,9 @@
 import { omit } from "lodash";
 import { UniqueEntityId } from "../../../@seedwork/domain/value-objects/unique-entity-id.vo";
-import { Category, Props } from "./category";
+import { Category, CategoryProps } from "./category";
 
 interface CategoryData {
-  props: Props;
+  props: CategoryProps;
   id?: UniqueEntityId;
 }
 
