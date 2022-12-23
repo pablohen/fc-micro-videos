@@ -3,6 +3,10 @@
     "parser": {
       "syntax": "typescript",
       "decorators": true
+    },
+    "baseUrl": "./src",
+    "paths": {
+      "#seedwork/*": ["./@seedwork/*"]
     }
   }
 }
