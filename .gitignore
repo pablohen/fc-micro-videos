@@ -1,3 +1,4 @@
 node_modules/
 tsconfig.tsbuildinfo
 .docker/zsh/history/.zsh_history
+__coverage

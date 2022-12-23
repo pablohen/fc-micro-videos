@@ -8,6 +8,7 @@
     "tsc": "tsc",
     "clean:tsc": "rm tsconfig.tsbuildinfo",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
