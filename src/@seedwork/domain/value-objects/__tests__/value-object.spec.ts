@@ -10,8 +10,6 @@ describe("ValueObject Unit Tests", () => {
 
     vo = new StubValueObject({ prop: "prop test" });
     expect(vo.value).toStrictEqual({ prop: "prop test" });
-
-    console.log(`${vo}`);
   });
 
   test("should convert to string", () => {
