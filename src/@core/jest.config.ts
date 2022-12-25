@@ -4,6 +4,10 @@
  */
 
 export default {
+  displayName: {
+    name: "@core",
+    color: "blue",
+  },
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -34,13 +38,13 @@ export default {
   coverageProvider: "v8",
 
   // A list of reporter names that Jest uses when writing coverage reports
-  coverageReporters: [
-    "json",
-    "html",
-    //   "text",
-    //   "lcov",
-    //   "clover"
-  ],
+  // coverageReporters: [
+  //   "json",
+  //   "html",
+  //   //   "text",
+  //   //   "lcov",
+  //   //   "clover"
+  // ],
 
   // An object that configures minimum threshold enforcement for coverage results
   coverageThreshold: {

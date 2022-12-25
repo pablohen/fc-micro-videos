@@ -4,13 +4,13 @@ import { GetCategoryUseCase } from "../get-category.use-case";
 
 describe("GetCategoryUseCase Unit Tests", () => {
   let repository: CategoryInMemoryRepository;
-  let createUseCase: CreateCategoryUseCase;
-  let getByIdUseCase: GetCategoryUseCase;
+  let createUseCase: CreateCategoryUseCase.UseCase;
+  let getByIdUseCase: GetCategoryUseCase.UseCase;
 
   beforeEach(() => {
     repository = new CategoryInMemoryRepository();
-    createUseCase = new CreateCategoryUseCase(repository);
-    getByIdUseCase = new GetCategoryUseCase(repository);
+    createUseCase = new CreateCategoryUseCase.UseCase(repository);
+    getByIdUseCase = new GetCategoryUseCase.UseCase(repository);
   });
 
   test("should throw an error when entity not found", async () => {

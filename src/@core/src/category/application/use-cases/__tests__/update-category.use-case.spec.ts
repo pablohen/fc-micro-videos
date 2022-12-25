@@ -1,21 +1,20 @@
 import { NotFoundError } from "../../../../@seedwork/domain/errors/not-found-error";
 import { Category } from "../../../../category/domain/entities/category";
 import { CategoryInMemoryRepository } from "../../../infra/repository/category-in-memory.repository";
-import {
-  Input,
-  Output,
-  UpdateCategoryUseCase,
-} from "../update-category.use-case";
+import { UpdateCategoryUseCase } from "../update-category.use-case";
 
-type Arrange = Array<{ input: Input; expected: Output }>;
+type Arrange = Array<{
+  input: UpdateCategoryUseCase.Input;
+  expected: UpdateCategoryUseCase.Output;
+}>;
 
 describe("UpdateCategoryUseCase Unit Tests", () => {
   let repository: CategoryInMemoryRepository;
-  let useCase: UpdateCategoryUseCase;
+  let useCase: UpdateCategoryUseCase.UseCase;
 
   beforeEach(() => {
     repository = new CategoryInMemoryRepository();
-    useCase = new UpdateCategoryUseCase(repository);
+    useCase = new UpdateCategoryUseCase.UseCase(repository);
   });
 
   test("should throw an error when entity not found", async () => {

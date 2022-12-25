@@ -5,11 +5,11 @@ import { ListCategoriesUseCase } from "../list-categories.use-case";
 
 describe("ListCategoriesUseCase Unit Tests", () => {
   let repository: CategoryInMemoryRepository;
-  let useCase: ListCategoriesUseCase;
+  let useCase: ListCategoriesUseCase.UseCase;
 
   beforeEach(() => {
     repository = new CategoryInMemoryRepository();
-    useCase = new ListCategoriesUseCase(repository);
+    useCase = new ListCategoriesUseCase.UseCase(repository);
   });
 
   test("toOutput method", () => {
