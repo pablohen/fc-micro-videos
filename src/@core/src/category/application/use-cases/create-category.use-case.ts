@@ -10,7 +10,7 @@ export namespace CreateCategoryUseCase {
     is_active?: boolean;
   }
 
-  type Output = CategoryOutput;
+  export type Output = CategoryOutput;
 
   export class UseCase implements DefaultUseCase<Input, Output> {
     constructor(private categoryRepository: CategoryRepository.Repository) {}

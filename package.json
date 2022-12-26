@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/pablohen/fc-micro-videos/issues"
   },
-  "homepage": "https://github.com/pablohen/fc-micro-videos#readme"
+  "homepage": "https://github.com/pablohen/fc-micro-videos#readme",
+  "devDependencies": {
+    "terminal-link": "^3.0.0"
+  }
 }
