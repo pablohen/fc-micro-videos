@@ -1,6 +1,6 @@
 import { NotFoundError } from "../../../../@seedwork/domain/errors/not-found-error";
 import { Category } from "../../../../category/domain/entities/category";
-import { CategoryInMemoryRepository } from "../../../infra/repository/category-in-memory.repository";
+import { CategoryInMemoryRepository } from "../../../infra/db/in-memory/category-in-memory.repository";
 import { UpdateCategoryUseCase } from "../update-category.use-case";
 
 type Arrange = Array<{

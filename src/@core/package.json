@@ -69,6 +69,9 @@
     "uuid": "^9.0.0"
   },
   "dependencies": {
-    "class-validator": "^0.14.0"
+    "class-validator": "^0.14.0",
+    "sequelize": "^6.28.0",
+    "sequelize-typescript": "^2.1.5",
+    "sqlite3": "^5.1.4"
   }
 }
