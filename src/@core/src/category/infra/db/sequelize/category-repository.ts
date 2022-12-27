@@ -1,5 +1,6 @@
 import { Category, CategoryRepository } from "#category/domain";
 import { NotFoundError, UniqueEntityId } from "#seedwork/domain";
+import { Op } from "sequelize";
 import { CategoryModelMapper } from "./category-mapper";
 import { CategoryModel } from "./category-model";
 
@@ -13,7 +14,33 @@ export class CategorySequelizeRepository
   async search(
     props: CategoryRepository.SearchParams
   ): Promise<CategoryRepository.SearchResult> {
-    throw new Error("Method not implemented.");
+    const offset = (props.page - 1) * props.per_page;
+    const limit = props.per_page;
+
+    const { rows: models, count } = await this.categoryModel.findAndCountAll({
+      ...(props.filter && {
+        where: {
+          name: {
+            [Op.like]: `%${props.filter}%`,
+          },
+        },
+      }),
+      ...(props.sort && this.sortableFields.includes(props.sort)
+        ? { order: [[props.sort, props.sort_dir]] }
+        : { order: [["created_at", "DESC"]] }),
+      offset,
+      limit,
+    });
+
+    return new CategoryRepository.SearchResult({
+      items: models.map((model) => CategoryModelMapper.toEntity(model)),
+      current_page: props.page,
+      per_page: props.per_page,
+      sort: props.sort,
+      sort_dir: props.sort_dir,
+      total: count,
+      filter: props.filter,
+    });
   }
 
   async insert(entity: Category): Promise<void> {
@@ -28,7 +55,9 @@ export class CategorySequelizeRepository
   }
 
   async findAll(): Promise<Category[]> {
-    throw new Error("Method not implemented.");
+    const models = await this.categoryModel.findAll();
+
+    return models.map((model) => CategoryModelMapper.toEntity(model));
   }
 
   async update(entity: Category): Promise<void> {
