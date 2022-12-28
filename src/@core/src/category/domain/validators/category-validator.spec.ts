@@ -73,7 +73,7 @@ describe("CategoryValidator Tests", () => {
     });
   });
 
-  test("should not throw errors on valid name", () => {
+  describe("should not throw errors on valid name", () => {
     const arrange: Arrange = [
       { name: "some value" },
       {
@@ -85,7 +85,7 @@ describe("CategoryValidator Tests", () => {
       { name: "some value", is_active: true },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       const isValid = validator.validate(item);
       expect(isValid).toBeTruthy();
       expect(validator.validatedData).toStrictEqual(new CategoryRules(item));

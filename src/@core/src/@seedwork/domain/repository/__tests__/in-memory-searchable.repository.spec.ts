@@ -256,30 +256,18 @@ describe("SearchableRepository Unit Tests", () => {
       );
     });
 
-    test("should apply paginate and sort", async () => {
+    describe("should apply paginate and sort", () => {
       const items = [
-        new StubEntity({
-          name: "b",
-          price: 5,
-        }),
-        new StubEntity({
-          name: "a",
-          price: 5,
-        }),
-        new StubEntity({
-          name: "d",
-          price: 10,
-        }),
-        new StubEntity({
-          name: "e",
-          price: 10,
-        }),
-        new StubEntity({
-          name: "c",
-          price: 10,
-        }),
+        new StubEntity({ name: "b", price: 5 }),
+        new StubEntity({ name: "a", price: 5 }),
+        new StubEntity({ name: "d", price: 10 }),
+        new StubEntity({ name: "e", price: 10 }),
+        new StubEntity({ name: "c", price: 10 }),
       ];
-      repository.items = items;
+
+      beforeEach(() => {
+        repository.items = items;
+      });
 
       const arrange: SearchArrange = [
         {
@@ -350,14 +338,14 @@ describe("SearchableRepository Unit Tests", () => {
         },
       ];
 
-      for (const item of arrange) {
+      test.each(arrange)("validate %j", async (item) => {
         const res = await repository.search(item.params);
         expect(res).toStrictEqual(item.result);
-      }
+      });
     });
   });
 
-  test("should search using filter, sort and paginate", async () => {
+  describe("should search using filter, sort and paginate", () => {
     const items = [
       new StubEntity({
         name: "test",
@@ -380,7 +368,10 @@ describe("SearchableRepository Unit Tests", () => {
         price: 10,
       }),
     ];
-    repository.items = items;
+
+    beforeEach(() => {
+      repository.items = items;
+    });
 
     const arrange: SearchArrange = [
       {
@@ -419,9 +410,9 @@ describe("SearchableRepository Unit Tests", () => {
       },
     ];
 
-    for (const item of arrange) {
+    test.each(arrange)("validate %j", async (item) => {
       const res = await repository.search(item.params);
       expect(res).toStrictEqual(item.result);
-    }
+    });
   });
 });

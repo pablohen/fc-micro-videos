@@ -12,7 +12,7 @@ type FilterArrange = Array<{ filter: any; expected: string | null }>;
 
 describe("Search Unit Tests", () => {
   describe("SearchParams Unit Tests", () => {
-    test("should check if page prop is working correctly", () => {
+    describe("should check if page prop is working correctly", () => {
       const params = new SearchParams();
       expect(params.page).toBe(1);
 
@@ -31,12 +31,12 @@ describe("Search Unit Tests", () => {
         { page: 2, expected: 2 },
       ];
 
-      arrange.forEach((item) => {
+      test.each(arrange)("validate %j", (item) => {
         expect(new SearchParams(item).page).toBe(item.expected);
       });
     });
 
-    test("should check if per_page prop is working correctly", () => {
+    describe("should check if per_page prop is working correctly", () => {
       const params = new SearchParams();
       expect(params.per_page).toBe(15);
 
@@ -56,12 +56,12 @@ describe("Search Unit Tests", () => {
         { per_page: true, expected: 15 },
       ];
 
-      arrange.forEach((item) => {
+      test.each(arrange)("validate %j", (item) => {
         expect(new SearchParams(item).per_page).toBe(item.expected);
       });
     });
 
-    test("should check if sort prop is working correctly", () => {
+    describe("should check if sort prop is working correctly", () => {
       const params = new SearchParams();
       expect(params.sort).toBeNull();
 
@@ -78,12 +78,12 @@ describe("Search Unit Tests", () => {
         { sort: "field", expected: "field" },
       ];
 
-      arrange.forEach((item) => {
+      test.each(arrange)("validate %j", (item) => {
         expect(new SearchParams(item).sort).toBe(item.expected);
       });
     });
 
-    test("should check if sort_dir prop is working correctly", () => {
+    describe("should check if sort_dir prop is working correctly", () => {
       let params = new SearchParams();
       expect(params.sort_dir).toBeNull();
 
@@ -113,12 +113,12 @@ describe("Search Unit Tests", () => {
         { sort: "field", sort_dir: "DESC", expected: "desc" },
       ];
 
-      arrange.forEach((item) => {
+      test.each(arrange)("validate %j", (item) => {
         expect(new SearchParams(item).sort_dir).toBe(item.expected);
       });
     });
 
-    test("should check if filter prop is working correctly", () => {
+    describe("should check if filter prop is working correctly", () => {
       const params = new SearchParams();
       expect(params.filter).toBeNull();
 
@@ -135,7 +135,7 @@ describe("Search Unit Tests", () => {
         { filter: "field", expected: "field" },
       ];
 
-      arrange.forEach((item) => {
+      test.each(arrange)("validate %j", (item) => {
         expect(new SearchParams(item).filter).toBe(item.expected);
       });
     });

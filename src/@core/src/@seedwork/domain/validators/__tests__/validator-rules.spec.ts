@@ -46,7 +46,7 @@ describe("ValidatorRules Unit Test", () => {
     expect(validator["value"]).toBe("a value");
   });
 
-  test("should be required", () => {
+  describe("should be required", () => {
     const errorMessage = "The field is required";
 
     let arrange: Arrange = [
@@ -58,7 +58,7 @@ describe("ValidatorRules Unit Test", () => {
       { value: "", property: "field" },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsInvalid({
         value: item.value,
         property: item.property,
@@ -77,7 +77,7 @@ describe("ValidatorRules Unit Test", () => {
       { value: false, property: "field" },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsValid({
         value: item.value,
         property: item.property,
@@ -87,7 +87,7 @@ describe("ValidatorRules Unit Test", () => {
     });
   });
 
-  test("should be string", () => {
+  describe("should be string", () => {
     const errorMessage = "The field must be a string";
 
     let arrange: Arrange = [
@@ -114,7 +114,7 @@ describe("ValidatorRules Unit Test", () => {
       { value: "test", property: "field" },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsValid({
         value: item.value,
         property: item.property,
@@ -124,13 +124,13 @@ describe("ValidatorRules Unit Test", () => {
     });
   });
 
-  test("should not exceed max length", () => {
+  describe("should not exceed max length", () => {
     const errorMessage =
       "The field length must be less or equal to 4 characters";
 
     let arrange: Arrange = [{ value: "12345", property: "field" }];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsInvalid({
         value: item.value,
         property: item.property,
@@ -146,7 +146,7 @@ describe("ValidatorRules Unit Test", () => {
       { value: "1234", property: "field" },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsValid({
         value: item.value,
         property: item.property,
@@ -157,7 +157,7 @@ describe("ValidatorRules Unit Test", () => {
     });
   });
 
-  test("should be boolean", () => {
+  describe("should be boolean", () => {
     const errorMessage = "The field must be a boolean";
 
     let arrange: Arrange = [
@@ -170,7 +170,7 @@ describe("ValidatorRules Unit Test", () => {
       { value: "false", property: "field" },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsInvalid({
         value: item.value,
         property: item.property,
@@ -186,7 +186,7 @@ describe("ValidatorRules Unit Test", () => {
       { value: false, property: "field" },
     ];
 
-    arrange.forEach((item) => {
+    test.each(arrange)("validate %j", (item) => {
       assertIsValid({
         value: item.value,
         property: item.property,

@@ -74,8 +74,8 @@ describe("Category Unit Tests", () => {
     });
   });
 
-  test("should have valid id", () => {
-    const data: CategoryData[] = [
+  describe("should have valid id", () => {
+    const arrange: CategoryData[] = [
       {
         props: { name: "Movie" },
       },
@@ -93,17 +93,19 @@ describe("Category Unit Tests", () => {
       },
     ];
 
-    data.forEach((item) => {
+    test.each(arrange)("when props is %j", (item) => {
       let category = new Category(item.props, item.id);
       expect(category.id).not.toBeNull();
       expect(category.uniqueEntityId).toBeInstanceOf(UniqueEntityId);
     });
   });
+
   test("should have valid name", () => {
     const category = new Category({ name: "Movie" });
 
     expect(category.name).toBe("Movie");
   });
+
   test("should have valid description", () => {
     let category = new Category({
       name: "Movie",
