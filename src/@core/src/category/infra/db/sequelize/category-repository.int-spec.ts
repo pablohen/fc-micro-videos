@@ -407,4 +407,50 @@ describe("CategoryRepository Tests", () => {
       });
     });
   });
+
+  test("should throw an error on update if entity not found", async () => {
+    const entity = new Category({ name: "Movie" });
+    await expect(repository.update(entity)).rejects.toThrow(
+      new NotFoundError(`Entity not found using id ${entity.id}`)
+    );
+  });
+
+  test("should update an entity", async () => {
+    const entity = new Category({ name: "Movie" });
+    await repository.insert(entity);
+
+    entity.update({ name: "Movie updated", description: entity.description });
+    await repository.update(entity);
+
+    const entityFound = await repository.findById(entity.id);
+    expect(entityFound.toJSON()).toStrictEqual(entity.toJSON());
+  });
+
+  test("should throw an error on delete if entity not found", async () => {
+    await expect(repository.delete("fakeId")).rejects.toThrow(
+      new NotFoundError(`Entity not found using id fakeId`)
+    );
+
+    await expect(
+      repository.delete(
+        new UniqueEntityId("6edb894a-42a2-4f85-ab1d-ecedaf293c51")
+      )
+    ).rejects.toThrow(
+      new NotFoundError(
+        `Entity not found using id 6edb894a-42a2-4f85-ab1d-ecedaf293c51`
+      )
+    );
+  });
+
+  test("should delete an entity", async () => {
+    const entity = new Category({ name: "Movie" });
+    await repository.insert(entity);
+
+    await repository.delete(entity.id);
+
+    const entityFound = await CategorySequelize.CategoryModel.findByPk(
+      entity.id
+    );
+    expect(entityFound).toBeNull();
+  });
 });
