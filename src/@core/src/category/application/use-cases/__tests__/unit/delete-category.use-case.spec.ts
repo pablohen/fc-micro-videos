@@ -1,12 +1,7 @@
-import { NotFoundError } from "../../../../@seedwork/domain/errors/not-found-error";
-import { Category } from "../../../domain/entities/category";
-import { CategoryInMemoryRepository } from "../../../infra/db/in-memory/category-in-memory.repository";
-import { DeleteCategoryUseCase } from "../delete-category.use-case";
-
-type Arrange = Array<{
-  input: DeleteCategoryUseCase.Input;
-  expected: DeleteCategoryUseCase.Output;
-}>;
+import { Category } from "#category/domain";
+import { CategoryInMemoryRepository } from "#category/infra";
+import { NotFoundError } from "#seedwork/domain";
+import { DeleteCategoryUseCase } from "../../delete-category.use-case";
 
 describe("DeleteCategoryUseCase Unit Tests", () => {
   let repository: CategoryInMemoryRepository;

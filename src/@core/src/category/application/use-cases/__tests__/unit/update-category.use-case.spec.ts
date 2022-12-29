@@ -1,7 +1,7 @@
-import { NotFoundError } from "../../../../@seedwork/domain/errors/not-found-error";
-import { Category } from "../../../../category/domain/entities/category";
-import { CategoryInMemoryRepository } from "../../../infra/db/in-memory/category-in-memory.repository";
-import { UpdateCategoryUseCase } from "../update-category.use-case";
+import { Category } from "#category/domain";
+import { CategoryInMemoryRepository } from "#category/infra";
+import { NotFoundError } from "#seedwork/domain";
+import { UpdateCategoryUseCase } from "../../update-category.use-case";
 
 type Arrange = Array<{
   input: UpdateCategoryUseCase.Input;
