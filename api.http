@@ -6,7 +6,7 @@ GET http://localhost:3000/categories
 
 
 ### getOne
-GET http://localhost:3000/categories/440dda2e-f109-4439-a2a3-f4f047d20914
+GET http://localhost:3000/categories/e193bc2c-1b4f-4695-aab7-a162ac7d0017
 Content-Type: application/json
 
 ### create

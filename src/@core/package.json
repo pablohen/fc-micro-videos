@@ -4,7 +4,9 @@
   "description": "videos catalog admin",
   "main": "index.js",
   "imports": {
+    "#seedwork/domain": "./dist/@seedwork/domain/index.js",
     "#seedwork/*": "./dist/@seedwork/*.js",
+    "#category/domain": "./dist/category/domain/index.js",
     "#category/*": "./dist/category/*.js"
   },
   "exports": {
@@ -46,7 +48,7 @@
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit",
     "cti": "cti",
-    "cti@core": "sh ./cti.sh"
+    "cti:make": "sh ./cti.sh"
   },
   "keywords": [],
   "author": "",
@@ -72,6 +74,7 @@
     "chance": "^1.1.9",
     "class-validator": "^0.14.0",
     "dotenv": "^16.0.3",
+    "mysql2": "^2.3.3",
     "sequelize": "^6.28.0",
     "sequelize-typescript": "^2.1.5",
     "sqlite3": "^5.1.4",

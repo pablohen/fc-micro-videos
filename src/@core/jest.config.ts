@@ -17,7 +17,7 @@ export default {
   // The directory where Jest should store its cached dependency information
   // cacheDirectory: "/tmp/jest_rs",
 
-  // Automatically clear mock calls, instances, contexts and results before every test
+  // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
@@ -38,13 +38,14 @@ export default {
   coverageProvider: "v8",
 
   // A list of reporter names that Jest uses when writing coverage reports
-  // coverageReporters: [
+  //coverageReporters: [
+  //"json",
+  //"html"
   //   "json",
-  //   "html",
-  //   //   "text",
-  //   //   "lcov",
-  //   //   "clover"
-  // ],
+  //   "text",
+  //   "lcov",
+  //   "clover"
+  //],
 
   // An object that configures minimum threshold enforcement for coverage results
   coverageThreshold: {
@@ -61,11 +62,6 @@ export default {
 
   // Make calling deprecated APIs throw helpful error messages
   // errorOnDeprecated: false,
-
-  // The default configuration for fake timers
-  // fakeTimers: {
-  //   "enableGlobally": false
-  // },
 
   // Force coverage collection from ignored files using an array of glob patterns
   // forceCoverageMatch: [],
@@ -90,8 +86,6 @@ export default {
   // An array of file extensions your modules use
   // moduleFileExtensions: [
   //   "js",
-  //   "mjs",
-  //   "cjs",
   //   "jsx",
   //   "ts",
   //   "tsx",
@@ -147,7 +141,10 @@ export default {
   // setupFiles: [],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ["./@seedwork/domain/tests/validations.ts"],
+  setupFilesAfterEnv: [
+    "./@seedwork/domain/tests/validations.ts",
+    "./@seedwork/domain/tests/jest.ts",
+  ],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,
@@ -183,6 +180,12 @@ export default {
 
   // This option allows use of a custom test runner
   // testRunner: "jest-circus/runner",
+
+  // This option sets the URL for the jsdom environment. It is reflected in properties such as location.href
+  // testURL: "http://localhost",
+
+  // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
+  // timers: "real",
 
   // A map from regular expressions to paths to transformers
   transform: {
