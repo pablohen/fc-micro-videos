@@ -11,6 +11,9 @@ import {
 export abstract class InMemoryRepository<E extends Entity>
   implements RepositoryInterface<E>
 {
+  bulkInsert(entities: E[]): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   items: E[] = [];
 
   async insert(entity: E): Promise<void> {
@@ -48,7 +51,7 @@ export abstract class InMemoryRepository<E extends Entity>
     const item = this.items.find((item) => item.id === id);
 
     if (!item) {
-      throw new NotFoundError("Entity not found");
+      throw new NotFoundError(`Entity not found using id ${id}`);
     }
 
     return item;
@@ -60,6 +63,10 @@ export abstract class InMemorySearchableRepository<E extends Entity>
   implements SearchableRepositoryInterface<E, any, any>
 {
   sortableFields: string[];
+
+  async bulkInsert(entities: E[]): Promise<void> {
+    this.items.push(...entities);
+  }
 
   async search(props: SearchParams): Promise<SearchResult<E>> {
     const itemsFiltered = await this.applyFilter(this.items, props.filter);

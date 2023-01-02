@@ -20,6 +20,7 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { SearchCategoryDto } from './dto/search-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryPresenter } from './presenter/category.presenter';
 
 @Controller('categories')
 export class CategoriesController {
@@ -39,8 +40,10 @@ export class CategoriesController {
   private listUseCase: ListCategoriesUseCase.UseCase;
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.createUseCase.execute(createCategoryDto);
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    const output = await this.createUseCase.execute(createCategoryDto);
+
+    return new CategoryPresenter(output);
   }
 
   @Get()
@@ -49,19 +52,23 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.getUseCase.execute({ id });
+  async findOne(@Param('id') id: string) {
+    const output = await this.getUseCase.execute({ id });
+
+    return new CategoryPresenter(output);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.updateUseCase.execute({
+    const output = await this.updateUseCase.execute({
       id,
       ...updateCategoryDto,
     });
+
+    return new CategoryPresenter(output);
   }
 
   @HttpCode(204)

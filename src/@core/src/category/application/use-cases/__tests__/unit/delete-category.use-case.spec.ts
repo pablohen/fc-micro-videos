@@ -13,8 +13,8 @@ describe("DeleteCategoryUseCase Unit Tests", () => {
   });
 
   test("should throw an error when entity not found", async () => {
-    expect(() => useCase.execute({ id: "fake id" })).rejects.toThrow(
-      new NotFoundError("Entity not found")
+    expect(() => useCase.execute({ id: "fakeId" })).rejects.toThrow(
+      new NotFoundError("Entity not found using id fakeId")
     );
   });
 

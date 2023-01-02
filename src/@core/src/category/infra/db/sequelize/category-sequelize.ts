@@ -54,7 +54,7 @@ export namespace CategorySequelize {
           id: chance.guid({ version: 4 }),
           name: chance.word(),
           description: chance.paragraph(),
-          is_active: chance.bool(),
+          is_active: true,
           created_at: chance.date(),
         })
       );
@@ -64,7 +64,7 @@ export namespace CategorySequelize {
   export class CategoryRepository
     implements CategoryRepositoryContract.Repository
   {
-    sortableFields: string[] = ["name", " created_at"];
+    sortableFields: string[] = ["name", "created_at"];
 
     constructor(private categoryModel: typeof CategoryModel) {}
 
@@ -102,6 +102,12 @@ export namespace CategorySequelize {
 
     async insert(entity: Category): Promise<void> {
       await this.categoryModel.create(entity.toJSON());
+    }
+
+    async bulkInsert(entities: Category[]): Promise<void> {
+      await this.categoryModel.bulkCreate(
+        entities.map((entity) => entity.toJSON())
+      );
     }
 
     async findById(id: string | UniqueEntityId): Promise<Category> {

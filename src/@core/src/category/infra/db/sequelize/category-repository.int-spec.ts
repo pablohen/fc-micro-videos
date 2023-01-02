@@ -221,7 +221,7 @@ describe("CategoryRepository Tests", () => {
     });
 
     test("should validate sortableFields", async () => {
-      expect(repository.sortableFields).toStrictEqual(["name", " created_at"]);
+      expect(repository.sortableFields).toStrictEqual(["name", "created_at"]);
     });
 
     describe("should apply paginate and sort", () => {

@@ -1,83 +1,153 @@
+import { UpdateCategoryUseCase } from "#category/application";
 import { Category } from "#category/domain";
 import { CategoryInMemoryRepository } from "#category/infra";
 import { NotFoundError } from "#seedwork/domain";
-import { UpdateCategoryUseCase } from "../../update-category.use-case";
-
-type Arrange = Array<{
-  input: UpdateCategoryUseCase.Input;
-  expected: UpdateCategoryUseCase.Output;
-}>;
 
 describe("UpdateCategoryUseCase Unit Tests", () => {
-  let repository: CategoryInMemoryRepository;
   let useCase: UpdateCategoryUseCase.UseCase;
+  let repository: CategoryInMemoryRepository;
 
   beforeEach(() => {
     repository = new CategoryInMemoryRepository();
     useCase = new UpdateCategoryUseCase.UseCase(repository);
   });
 
-  test("should throw an error when entity not found", async () => {
-    expect(() =>
-      useCase.execute({ id: "fake id", name: "fake desc" })
-    ).rejects.toThrow(new NotFoundError("Entity not found"));
+  it("should throws error when entity not found", async () => {
+    await expect(() =>
+      useCase.execute({ id: "fake id", name: "fake" })
+    ).rejects.toThrow(new NotFoundError(`Entity not found using id fake id`));
   });
 
-  test("should update a category", async () => {
-    const entity = new Category({
-      name: "Movie",
-    });
-
+  it("should update a category", async () => {
+    const spyUpdate = jest.spyOn(repository, "update");
+    const entity = new Category({ name: "Movie" });
     repository.items = [entity];
 
-    const arrange: Arrange = [
+    let output = await useCase.execute({ id: entity.id, name: "test" });
+    expect(spyUpdate).toHaveBeenCalledTimes(1);
+    expect(output).toStrictEqual({
+      id: entity.id,
+      name: "test",
+      description: null,
+      is_active: true,
+      created_at: entity.created_at,
+    });
+
+    type Arrange = {
+      input: {
+        id: string;
+        name: string;
+        description?: null | string;
+        is_active?: boolean;
+      };
+      expected: {
+        id: string;
+        name: string;
+        description: null | string;
+        is_active: boolean;
+        created_at: Date;
+      };
+    };
+    const arrange: Arrange[] = [
       {
         input: {
           id: entity.id,
-          name: "categoria",
+          name: "test",
+          description: "some description",
         },
         expected: {
           id: entity.id,
-          name: "categoria",
-          description: entity.description,
-          is_active: entity.is_active,
+          name: "test",
+          description: "some description",
+          is_active: true,
           created_at: entity.created_at,
         },
       },
       {
         input: {
           id: entity.id,
-          name: "categoria",
-          description: "some description",
+          name: "test",
         },
         expected: {
           id: entity.id,
-          name: "categoria",
-          description: "some description",
-          is_active: entity.is_active,
-          created_at: entity.created_at,
-        },
-      },
-      {
-        input: {
-          id: entity.id,
-          name: "categoria",
+          name: "test",
           description: null,
+          is_active: true,
+          created_at: entity.created_at,
+        },
+      },
+      {
+        input: {
+          id: entity.id,
+          name: "test",
           is_active: false,
         },
         expected: {
           id: entity.id,
-          name: "categoria",
+          name: "test",
           description: null,
+          is_active: false,
+          created_at: entity.created_at,
+        },
+      },
+      {
+        input: {
+          id: entity.id,
+          name: "test",
+        },
+        expected: {
+          id: entity.id,
+          name: "test",
+          description: null,
+          is_active: false,
+          created_at: entity.created_at,
+        },
+      },
+      {
+        input: {
+          id: entity.id,
+          name: "test",
+          is_active: true,
+        },
+        expected: {
+          id: entity.id,
+          name: "test",
+          description: null,
+          is_active: true,
+          created_at: entity.created_at,
+        },
+      },
+      {
+        input: {
+          id: entity.id,
+          name: "test",
+          description: "some description",
+          is_active: false,
+        },
+        expected: {
+          id: entity.id,
+          name: "test",
+          description: "some description",
           is_active: false,
           created_at: entity.created_at,
         },
       },
     ];
 
-    for (const item of arrange) {
-      const output = await useCase.execute(item.input);
-      expect(output).toStrictEqual(item.expected);
+    for (const i of arrange) {
+      output = await useCase.execute({
+        id: i.input.id,
+        name: i.input.name,
+        description: i.input.description,
+        is_active: i.input.is_active,
+      });
+      expect(output).toStrictEqual({
+        id: entity.id,
+        name: i.expected.name,
+        description: i.expected.description,
+        is_active: i.expected.is_active,
+        created_at: i.expected.created_at,
+      });
     }
   });
 });
