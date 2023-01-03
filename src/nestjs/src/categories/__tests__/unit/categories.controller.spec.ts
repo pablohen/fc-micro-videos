@@ -4,7 +4,10 @@ import {
   ListCategoriesUseCase,
   UpdateCategoryUseCase,
 } from '@fc/micro-videos/category/application';
-import { CategoryPresenter } from '../../../categories/presenter/category.presenter';
+import {
+  CategoryCollectionPresenter,
+  CategoryPresenter,
+} from '../../../categories/presenter/category.presenter';
 import { CategoriesController } from '../../categories.controller';
 import { CreateCategoryDto } from '../../dto/create-category.dto';
 import { SearchCategoryDto } from '../../dto/search-category.dto';
@@ -144,8 +147,8 @@ describe('CategoriesController Unit Tests', () => {
     //@ts-expect-error --- i know
     controller['listUseCase'] = mockListUseCase;
 
-    const output = await controller.search(searchParams);
+    const presenter = await controller.search(searchParams);
     expect(mockListUseCase.execute).toBeCalledWith(searchParams);
-    expect(expectedOutput).toStrictEqual(output);
+    expect(presenter).toBeInstanceOf(CategoryCollectionPresenter);
   });
 });

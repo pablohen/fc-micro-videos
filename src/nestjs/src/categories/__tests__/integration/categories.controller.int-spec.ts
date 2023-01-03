@@ -1,4 +1,7 @@
-import { NotFoundError } from '@fc/micro-videos/@seedwork/domain';
+import {
+  NotFoundError,
+  SortDirection,
+} from '@fc/micro-videos/@seedwork/domain';
 import {
   CreateCategoryUseCase,
   DeleteCategoryUseCase,
@@ -9,6 +12,7 @@ import {
 import { Category, CategoryRepository } from '@fc/micro-videos/category/domain';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CATEGORY_PROVIDERS } from '../../../categories/category.providers';
+import { CategoryCollectionPresenter } from '../../../categories/presenter/category.presenter';
 import { ConfigModule } from '../../../config/config.module';
 import { DatabaseModule } from '../../../database/database.module';
 import { CategoriesController } from '../../categories.controller';
@@ -229,5 +233,151 @@ describe('CategoriesController Integration Tests', () => {
     expect(presenter.description).toBe(category.description);
     expect(presenter.is_active).toBe(category.is_active);
     expect(presenter.created_at).toStrictEqual(category.created_at);
+  });
+
+  describe('search method', () => {
+    test('should return categories using empty query with categories ordered by created_at', async () => {
+      const categories = Category.fake()
+        .theCategories(4)
+        .withName((index) => index + '')
+        .withCreatedAt((index) => new Date(new Date().getTime() + index))
+        .build();
+
+      await repository.bulkInsert(categories);
+
+      const arrange = [
+        {
+          send_data: {},
+          expected: {
+            items: [categories[3], categories[2], categories[1], categories[0]],
+            current_page: 1,
+            last_page: 1,
+            per_page: 15,
+            total: 4,
+          },
+        },
+        {
+          send_data: { per_page: 2 },
+          expected: {
+            items: [categories[3], categories[2]],
+            current_page: 1,
+            last_page: 2,
+            per_page: 2,
+            total: 4,
+          },
+        },
+        {
+          send_data: { page: 2, per_page: 2 },
+          expected: {
+            items: [categories[1], categories[0]],
+            current_page: 2,
+            last_page: 2,
+            per_page: 2,
+            total: 4,
+          },
+        },
+      ];
+
+      for (const item of arrange) {
+        const presenter = await controller.search(item.send_data);
+        expect(presenter).toEqual(
+          new CategoryCollectionPresenter(item.expected),
+        );
+      }
+    });
+
+    test('should returns output using pagination, sort and filter', async () => {
+      const faker = Category.fake().aCategory();
+      const categories = [
+        faker.withName('a').build(),
+        faker.withName('AAA').build(),
+        faker.withName('AaA').build(),
+        faker.withName('b').build(),
+        faker.withName('c').build(),
+      ];
+      await repository.bulkInsert(categories);
+
+      const arrange_asc = [
+        {
+          send_data: {
+            page: 1,
+            per_page: 2,
+            sort: 'name',
+            filter: 'a',
+          },
+          expected: {
+            items: [categories[1], categories[2]],
+            current_page: 1,
+            last_page: 2,
+            per_page: 2,
+            total: 3,
+          },
+        },
+        {
+          send_data: {
+            page: 2,
+            per_page: 2,
+            sort: 'name',
+            filter: 'a',
+          },
+          expected: {
+            items: [categories[0]],
+            current_page: 2,
+            last_page: 2,
+            per_page: 2,
+            total: 3,
+          },
+        },
+      ];
+
+      for (const item of arrange_asc) {
+        const presenter = await controller.search(item.send_data);
+        expect(presenter).toEqual(
+          new CategoryCollectionPresenter(item.expected),
+        );
+      }
+
+      const arrange_desc = [
+        {
+          send_data: {
+            page: 1,
+            per_page: 2,
+            sort: 'name',
+            sort_dir: 'desc' as SortDirection,
+            filter: 'a',
+          },
+          expected: {
+            items: [categories[0], categories[2]],
+            current_page: 1,
+            last_page: 2,
+            per_page: 2,
+            total: 3,
+          },
+        },
+        {
+          send_data: {
+            page: 2,
+            per_page: 2,
+            sort: 'name',
+            sort_dir: 'desc' as SortDirection,
+            filter: 'a',
+          },
+          expected: {
+            items: [categories[1]],
+            current_page: 2,
+            last_page: 2,
+            per_page: 2,
+            total: 3,
+          },
+        },
+      ];
+
+      for (const item of arrange_desc) {
+        const presenter = await controller.search(item.send_data);
+        expect(presenter).toEqual(
+          new CategoryCollectionPresenter(item.expected),
+        );
+      }
+    });
   });
 });
