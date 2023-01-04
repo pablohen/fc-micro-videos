@@ -1,4 +1,4 @@
-import { CategoryRepository } from '@fc/micro-videos/category/domain';
+import { Category, CategoryRepository } from '@fc/micro-videos/category/domain';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { instanceToPlain } from 'class-transformer';
@@ -6,7 +6,7 @@ import request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { CategoriesController } from '../../src/categories/categories.controller';
 import { CATEGORY_PROVIDERS } from '../../src/categories/category.providers';
-import { CreateCategoryFixture } from '../../src/categories/fixtures';
+import { UpdateCategoryFixture } from '../../src/categories/fixtures';
 import { applyGlobalConfig } from '../../src/global-config';
 
 function startApp({
@@ -36,10 +36,48 @@ function startApp({
 }
 
 describe('CategoriesController (e2e)', () => {
-  describe('POST /categories', () => {
+  const uuid = 'e0839f2e-866c-4569-89fa-b08319688451';
+
+  describe('PUT /categories/:id', () => {
+    describe('should send an error when id is invalid or not found', () => {
+      const nestApp = startApp();
+      const faker = Category.fake().aCategory();
+      const arrange = [
+        {
+          id: uuid,
+          send_data: { name: faker.name },
+          expected: {
+            message: `Entity not found using id ${uuid}`,
+            statusCode: 404,
+            error: 'Not Found',
+          },
+        },
+        {
+          id: 'fake id',
+          send_data: { name: faker.name },
+          expected: {
+            statusCode: 422,
+            message: 'Validation failed (uuid  is expected)',
+            error: 'Unprocessable Entity',
+          },
+        },
+      ];
+
+      test.each(arrange)(
+        'when id is $id',
+        async ({ id, send_data, expected }) => {
+          return request(nestApp.app.getHttpServer())
+            .put(`/categories/${id}`)
+            .send(send_data)
+            .expect(expected.statusCode)
+            .expect(expected);
+        },
+      );
+    });
+
     describe('should send status code 422 when request body is invalid', () => {
       const app = startApp();
-      const invalidRequest = CreateCategoryFixture.arrangeInvalidRequest();
+      const invalidRequest = UpdateCategoryFixture.arrangeInvalidRequest();
       const arrange = Object.keys(invalidRequest).map((key) => ({
         label: key,
         value: invalidRequest[key],
@@ -47,7 +85,7 @@ describe('CategoriesController (e2e)', () => {
 
       test.each(arrange)('when body $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .post('/categories')
+          .put(`/categories/${uuid}`)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -62,24 +100,12 @@ describe('CategoriesController (e2e)', () => {
       });
 
       const validationError =
-        CreateCategoryFixture.arrangeForEntityValidationError();
+        UpdateCategoryFixture.arrangeForEntityValidationError();
       const arrange = Object.keys(validationError).map((key) => ({
         label: key,
         value: validationError[key],
       }));
 
-      test.each(arrange)('when body $label', ({ value }) => {
-        return request(app.app.getHttpServer())
-          .post('/categories')
-          .send(value.send_data)
-          .expect(422)
-          .expect(value.expected);
-      });
-    });
-
-    describe('should update a category', () => {
-      const app = startApp();
-      const arrange = CreateCategoryFixture.arrangeForSave();
       let repository: CategoryRepository.Repository;
 
       beforeEach(() => {
@@ -88,28 +114,47 @@ describe('CategoriesController (e2e)', () => {
         );
       });
 
-      test('should validate', () => {
+      test.each(arrange)('when body $label', async ({ value }) => {
+        const categoryCreated = Category.fake().aCategory().build();
+        await repository.insert(categoryCreated);
+
         return request(app.app.getHttpServer())
-          .post('/categories')
-          .send({})
-          .expect(422);
+          .put(`/categories/${categoryCreated.id}`)
+          .send(value.send_data)
+          .expect(422)
+          .expect(value.expected);
+      });
+    });
+
+    describe('should create a category', () => {
+      const app = startApp();
+      const arrange = UpdateCategoryFixture.arrangeForSave();
+      let repository: CategoryRepository.Repository;
+
+      beforeEach(() => {
+        repository = app.app.get<CategoryRepository.Repository>(
+          CATEGORY_PROVIDERS.REPOSITORIES.CATEGORY_REPOSITORY.provide,
+        );
       });
 
       test.each(arrange)(
         'when body is $send_data',
         async ({ send_data, expected }) => {
-          const res = await request(app.app.getHttpServer())
-            .post('/categories')
-            .send(send_data)
-            .expect(201);
+          const categoryCreated = Category.fake().aCategory().build();
+          await repository.insert(categoryCreated);
 
-          const keysInResponse = CreateCategoryFixture.keysInCategoryResponse();
+          const res = await request(app.app.getHttpServer())
+            .put(`/categories/${categoryCreated.id}`)
+            .send(send_data)
+            .expect(200);
+
+          const keysInResponse = UpdateCategoryFixture.keysInCategoryResponse();
           expect(Object.keys(res.body)).toStrictEqual(['data']);
           expect(Object.keys(res.body.data)).toStrictEqual(keysInResponse);
 
-          const categoryCreated = await repository.findById(res.body.data.id);
+          const categoryUpdated = await repository.findById(res.body.data.id);
           const presenter = CategoriesController.categoryToResponse(
-            categoryCreated.toJSON(),
+            categoryUpdated.toJSON(),
           );
           const serialized = instanceToPlain(presenter);
 
