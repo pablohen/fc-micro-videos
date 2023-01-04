@@ -9,76 +9,133 @@ import { CATEGORY_PROVIDERS } from '../../src/categories/category.providers';
 import { CategoryFixture } from '../../src/categories/fixtures';
 import { applyGlobalConfig } from '../../src/global-config';
 
-describe('CategoriesController (e2e)', () => {
-  let app: INestApplication;
-  let repository: CategoryRepository.Repository;
+function startApp({
+  beforeInit,
+}: {
+  beforeInit?: (app: INestApplication) => void;
+} = {}) {
+  let _app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    repository = moduleFixture.get<CategoryRepository.Repository>(
-      CATEGORY_PROVIDERS.REPOSITORIES.CATEGORY_REPOSITORY.provide,
-    );
-    app = moduleFixture.createNestApplication();
-    applyGlobalConfig(app);
+    _app = moduleFixture.createNestApplication();
+    applyGlobalConfig(_app);
 
-    await app.init();
+    beforeInit && beforeInit(_app);
+    await _app.init();
   });
 
-  describe('should send status code 422 when request body is invalid', () => {
-    const invalidRequest = CategoryFixture.arrangeInvalidRequest();
-    const arrange = Object.keys(invalidRequest).map((key) => ({
-      label: key,
-      value: invalidRequest[key],
-    }));
+  return {
+    get app() {
+      return _app;
+    },
+  };
+}
 
-    test.each(arrange)('when body $label', ({ value }) => {
-      return request(app.getHttpServer())
-        .post('/categories')
-        .send(value.send_data)
-        .expect(422)
-        .expect(value.expected);
-    });
-  });
-
+describe('CategoriesController (e2e)', () => {
   describe('POST /categories', () => {
-    const arrange = CategoryFixture.arrangeForSave();
+    let app: INestApplication;
+    let repository: CategoryRepository.Repository;
 
-    test('should validate', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/categories')
-        .send({})
-        .expect(422);
-      console.log(res.body);
+    beforeEach(async () => {
+      const moduleFixture: TestingModule = await Test.createTestingModule({
+        imports: [AppModule],
+      }).compile();
+
+      repository = moduleFixture.get<CategoryRepository.Repository>(
+        CATEGORY_PROVIDERS.REPOSITORIES.CATEGORY_REPOSITORY.provide,
+      );
+      app = moduleFixture.createNestApplication();
+      applyGlobalConfig(app);
+
+      await app.init();
     });
 
-    test.each(arrange)(
-      'when body is $send_data',
-      async ({ send_data, expected }) => {
-        const res = await request(app.getHttpServer())
+    describe('should send status code 422 when request body is invalid', () => {
+      const app = startApp();
+      const invalidRequest = CategoryFixture.arrangeInvalidRequest();
+      const arrange = Object.keys(invalidRequest).map((key) => ({
+        label: key,
+        value: invalidRequest[key],
+      }));
+
+      test.each(arrange)('when body $label', ({ value }) => {
+        return request(app.app.getHttpServer())
           .post('/categories')
-          .send(send_data)
-          .expect(201);
+          .send(value.send_data)
+          .expect(422)
+          .expect(value.expected);
+      });
+    });
 
-        const keysInResponse = CategoryFixture.keysInCategoryResponse();
-        expect(Object.keys(res.body)).toStrictEqual(['data']);
-        expect(Object.keys(res.body.data)).toStrictEqual(keysInResponse);
+    describe('should send status code 422 on EntityValidationError', () => {
+      const app = startApp({
+        beforeInit: (app) => {
+          app['config'].globalPipes = [];
+        },
+      });
 
-        const categoryCreated = await repository.findById(res.body.data.id);
-        const presenter = CategoriesController.categoryToResponse(
-          categoryCreated.toJSON(),
+      const validationError = CategoryFixture.arrangeForEntityValidationError();
+      const arrange = Object.keys(validationError).map((key) => ({
+        label: key,
+        value: validationError[key],
+      }));
+
+      test.each(arrange)('when body $label', ({ value }) => {
+        return request(app.app.getHttpServer())
+          .post('/categories')
+          .send(value.send_data)
+          .expect(422)
+          .expect(value.expected);
+      });
+    });
+
+    describe('should create a category', () => {
+      const app = startApp();
+      const arrange = CategoryFixture.arrangeForSave();
+
+      beforeEach(() => {
+        repository = app.app.get<CategoryRepository.Repository>(
+          CATEGORY_PROVIDERS.REPOSITORIES.CATEGORY_REPOSITORY.provide,
         );
-        const serialized = instanceToPlain(presenter);
+      });
 
-        expect(res.body.data).toStrictEqual({
-          id: serialized.id,
-          created_at: serialized.created_at,
-          ...send_data,
-          ...expected,
-        });
-      },
-    );
+      test('should validate', () => {
+        return request(app.app.getHttpServer())
+          .post('/categories')
+          .send({})
+          .expect(422);
+      });
+
+      test.each(arrange)(
+        'when body is $send_data',
+        async ({ send_data, expected }) => {
+          const res = await request(app.app.getHttpServer())
+            .post('/categories')
+            .send(send_data)
+            .expect(201);
+
+          const keysInResponse = CategoryFixture.keysInCategoryResponse();
+          expect(Object.keys(res.body)).toStrictEqual(['data']);
+          expect(Object.keys(res.body.data)).toStrictEqual(keysInResponse);
+
+          const categoryCreated = await repository.findById(res.body.data.id);
+          const presenter = CategoriesController.categoryToResponse(
+            categoryCreated.toJSON(),
+          );
+          const serialized = instanceToPlain(presenter);
+
+          expect(res.body.data).toStrictEqual({
+            id: serialized.id,
+            created_at: serialized.created_at,
+            ...send_data,
+            ...expected,
+          });
+        },
+      );
+    });
   });
 });
