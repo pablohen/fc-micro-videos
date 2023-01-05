@@ -1,6 +1,6 @@
 import { Category } from '@fc/micro-videos/category/domain';
 
-class CategoryFixture {
+export class CategoryFixture {
   static keysInCategoryResponse() {
     return ['id', 'name', 'description', 'is_active', 'created_at'];
   }

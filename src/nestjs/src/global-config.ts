@@ -12,6 +12,7 @@ export function applyGlobalConfig(app: INestApplication) {
   app.useGlobalPipes(
     new ValidationPipe({
       errorHttpStatusCode: 422,
+      forbidUnknownValues: false, // temporary fix for category search
     }),
   );
   app.useGlobalInterceptors(

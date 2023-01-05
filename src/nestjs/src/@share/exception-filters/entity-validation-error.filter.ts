@@ -1,17 +1,18 @@
 import { EntityValidationError } from '@fc/micro-videos/@seedwork/domain';
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { Response } from 'express';
+import { union } from 'lodash';
 
 @Catch(EntityValidationError)
 export class EntityValidationErrorFilter implements ExceptionFilter {
   catch(exception: EntityValidationError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const res = ctx.getResponse();
-    const statusCode = 422;
+    const response = ctx.getResponse<Response>();
 
-    res.status(statusCode).json({
-      statusCode,
+    response.status(422).json({
+      statusCode: 422,
       error: 'Unprocessable Entity',
-      message: Object.values(exception.error).flat(),
+      message: union(...Object.values(exception.error)),
     });
   }
 }

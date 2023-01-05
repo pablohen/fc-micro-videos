@@ -1,4 +1,6 @@
+__coverage
+.docker/dbdata
+.docker/zsh/history/.zsh_history
+docker-compose.override.yml
 node_modules/
 tsconfig.tsbuildinfo
-.docker/zsh/history/.zsh_history
-__coverage

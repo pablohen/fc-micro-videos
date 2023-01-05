@@ -48,8 +48,8 @@ describe('DatabaseModule Unit Tests', () => {
   describe('mysql connection', () => {
     const connOptions = {
       DB_VENDOR: 'mysql',
-      DB_HOST: 'localhost',
-      DB_DATABASE: 'micro-videos',
+      DB_HOST: 'db_test',
+      DB_DATABASE: 'micro_videos_test',
       DB_USERNAME: 'root',
       DB_PASSWORD: 'root',
       DB_PORT: 3306,
