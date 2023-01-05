@@ -76,7 +76,7 @@ export class SearchParams<Filter = string> {
       value === null || value === undefined || value === "" ? null : `${value}`;
   }
 
-  get sort_dir(): string | null {
+  get sort_dir(): SortDirection | null {
     return this._sort_dir;
   }
 

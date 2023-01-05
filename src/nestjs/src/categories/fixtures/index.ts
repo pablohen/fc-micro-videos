@@ -1,7 +1,7 @@
 import { Category } from '@fc/micro-videos/category/domain';
 
 export class CategoryFixture {
-  static keysInCategoryResponse() {
+  static keysInResponse() {
     return ['id', 'name', 'description', 'is_active', 'created_at'];
   }
 
@@ -218,8 +218,8 @@ export class CategoryFixture {
 }
 
 export class CreateCategoryFixture {
-  static keysInCategoryResponse() {
-    return CategoryFixture.keysInCategoryResponse();
+  static keysInResponse() {
+    return CategoryFixture.keysInResponse();
   }
   static arrangeForSave() {
     return CategoryFixture.arrangeForSave();
@@ -235,8 +235,8 @@ export class CreateCategoryFixture {
 }
 
 export class UpdateCategoryFixture {
-  static keysInCategoryResponse() {
-    return CategoryFixture.keysInCategoryResponse();
+  static keysInResponse() {
+    return CategoryFixture.keysInResponse();
   }
   static arrangeForSave() {
     return CategoryFixture.arrangeForSave();
@@ -251,5 +251,125 @@ export class UpdateCategoryFixture {
       CategoryFixture.arrangeForEntityValidationError();
 
     return otherKeys;
+  }
+}
+
+export class ListCategoriesFixture {
+  static arrangeIncrementedWithCreatedAt() {
+    const _entities = Category.fake()
+      .theCategories(4)
+      .withName((i) => i + '')
+      .withCreatedAt((i) => new Date(new Date().getTime() + i * 2000))
+      .build();
+
+    const entitiesMap = {
+      first: _entities[0],
+      second: _entities[1],
+      third: _entities[2],
+      fourth: _entities[3],
+    };
+
+    const arrange = [
+      {
+        send_data: {},
+        expected: {
+          entities: [
+            entitiesMap.fourth,
+            entitiesMap.third,
+            entitiesMap.second,
+            entitiesMap.first,
+          ],
+          meta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 15,
+            total: 4,
+          },
+        },
+      },
+      {
+        send_data: {
+          page: 1,
+          per_page: 2,
+        },
+        expected: {
+          entities: [entitiesMap.fourth, entitiesMap.third],
+          meta: {
+            current_page: 1,
+            last_page: 2,
+            per_page: 2,
+            total: 4,
+          },
+        },
+      },
+      {
+        send_data: {
+          page: 2,
+          per_page: 2,
+        },
+        expected: {
+          entities: [entitiesMap.second, entitiesMap.first],
+          meta: {
+            current_page: 2,
+            last_page: 2,
+            per_page: 2,
+            total: 4,
+          },
+        },
+      },
+    ];
+
+    return { arrange, entitiesMap };
+  }
+
+  static arrangeUnsorted() {
+    const faker = Category.fake().aCategory();
+
+    const entitiesMap = {
+      a: faker.withName('a').build(),
+      AAA: faker.withName('AAA').build(),
+      AaA: faker.withName('AaA').build(),
+      b: faker.withName('b').build(),
+      c: faker.withName('c').build(),
+    };
+
+    const arrange = [
+      {
+        send_data: {
+          page: 1,
+          per_page: 2,
+          sort: 'name',
+          filter: 'a',
+        },
+        expected: {
+          entities: [entitiesMap.AAA, entitiesMap.AaA],
+          meta: {
+            total: 3,
+            current_page: 1,
+            last_page: 2,
+            per_page: 2,
+          },
+        },
+      },
+      {
+        send_data: {
+          page: 2,
+          per_page: 2,
+          sort: 'name',
+          filter: 'a',
+        },
+        expected: {
+          entities: [entitiesMap.a],
+          meta: {
+            total: 3,
+            current_page: 2,
+            last_page: 2,
+            per_page: 2,
+          },
+        },
+      },
+    ];
+
+    return { arrange, entitiesMap };
   }
 }

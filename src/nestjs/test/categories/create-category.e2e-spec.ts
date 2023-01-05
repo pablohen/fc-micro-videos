@@ -8,7 +8,7 @@ import { CATEGORY_PROVIDERS } from '../../src/categories/category.providers';
 import { CreateCategoryFixture } from '../../src/categories/fixtures';
 
 describe('CategoriesController (e2e)', () => {
-  describe('POST /categories', () => {
+  describe('/categories (POST)', () => {
     describe('should send status code 422 when request body is invalid', () => {
       const app = startApp();
       const invalidRequest = CreateCategoryFixture.arrangeInvalidRequest();
@@ -77,7 +77,7 @@ describe('CategoriesController (e2e)', () => {
             .send(send_data)
             .expect(201);
 
-          const keysInResponse = CreateCategoryFixture.keysInCategoryResponse();
+          const keysInResponse = CreateCategoryFixture.keysInResponse();
           expect(Object.keys(res.body)).toStrictEqual(['data']);
           expect(Object.keys(res.body.data)).toStrictEqual(keysInResponse);
 

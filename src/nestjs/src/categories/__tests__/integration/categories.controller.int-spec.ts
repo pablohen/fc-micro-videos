@@ -1,7 +1,4 @@
-import {
-  NotFoundError,
-  SortDirection,
-} from '@fc/micro-videos/@seedwork/domain';
+import { NotFoundError } from '@fc/micro-videos/@seedwork/domain';
 import {
   CreateCategoryUseCase,
   DeleteCategoryUseCase,
@@ -12,7 +9,11 @@ import {
 import { Category, CategoryRepository } from '@fc/micro-videos/category/domain';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CATEGORY_PROVIDERS } from '../../../categories/category.providers';
-import { CategoryFixture } from '../../../categories/fixtures';
+import {
+  CategoryFixture,
+  ListCategoriesFixture,
+  UpdateCategoryFixture,
+} from '../../../categories/fixtures';
 import {
   CategoryCollectionPresenter,
   CategoryPresenter,
@@ -55,90 +56,10 @@ describe('CategoriesController Integration Tests', () => {
   });
 
   describe('should create a category', () => {
-    const arrange = [
-      {
-        request: {
-          name: 'Movie',
-        },
-        expectedPresenter: {
-          name: 'Movie',
-          description: null,
-          is_active: true,
-        },
-      },
-      {
-        request: {
-          name: 'Movie',
-          description: null,
-        },
-        expectedPresenter: {
-          name: 'Movie',
-          description: null,
-          is_active: true,
-        },
-      },
-      {
-        request: {
-          name: 'Movie',
-          is_active: true,
-        },
-        expectedPresenter: {
-          name: 'Movie',
-          description: null,
-          is_active: true,
-        },
-      },
-      {
-        request: {
-          name: 'Movie',
-          is_active: false,
-        },
-        expectedPresenter: {
-          name: 'Movie',
-          description: null,
-          is_active: false,
-        },
-      },
-      {
-        request: {
-          name: 'Movie',
-          description: 'description test',
-        },
-        expectedPresenter: {
-          name: 'Movie',
-          description: 'description test',
-          is_active: true,
-        },
-      },
-    ];
-
-    test.each(arrange)(
-      'validate %j',
-      async ({ request, expectedPresenter }) => {
-        const presenter = await controller.create(request);
-
-        const entity = await repository.findById(presenter.id);
-        expect(presenter.id).toBe(entity.id);
-        expect(presenter.name).toBe(expectedPresenter.name);
-        expect(presenter.description).toBe(expectedPresenter.description);
-        expect(presenter.is_active).toBe(expectedPresenter.is_active);
-        expect(presenter.created_at).toStrictEqual(entity.created_at);
-      },
-    );
-  });
-
-  describe('should update a category', () => {
-    const category = Category.fake().aCategory().build();
-
-    beforeEach(async () => {
-      await repository.insert(category);
-    });
-
     const arrange = CategoryFixture.arrangeForSave();
 
-    test.each(arrange)('validate %j', async ({ send_data, expected }) => {
-      const presenter = await controller.update(category.id, send_data);
-
+    test.each(arrange)('when  $send_data', async ({ send_data, expected }) => {
+      const presenter = await controller.create(send_data);
       const entity = await repository.findById(presenter.id);
 
       expect(entity.toJSON()).toStrictEqual({
@@ -147,7 +68,30 @@ describe('CategoriesController Integration Tests', () => {
         ...send_data,
         ...expected,
       });
-      expect(entity).toMatchObject(new CategoryPresenter(entity));
+
+      expect(presenter).toEqual(new CategoryPresenter(entity));
+    });
+  });
+
+  describe('should update a category', () => {
+    const arrange = UpdateCategoryFixture.arrangeForSave();
+
+    const category = Category.fake().aCategory().build();
+    beforeEach(async () => {
+      await repository.insert(category);
+    });
+
+    test.each(arrange)('when $send_data', async ({ send_data, expected }) => {
+      const presenter = await controller.update(category.id, send_data);
+      const entity = await repository.findById(presenter.id);
+
+      expect(entity).toMatchObject({
+        id: presenter.id,
+        created_at: presenter.created_at,
+        ...send_data,
+        ...expected,
+      });
+      expect(presenter).toEqual(new CategoryPresenter(entity));
     });
   });
 
@@ -177,148 +121,47 @@ describe('CategoriesController Integration Tests', () => {
   });
 
   describe('search method', () => {
-    test('should return categories using empty query with categories ordered by created_at', async () => {
-      const categories = Category.fake()
-        .theCategories(4)
-        .withName((index) => index + '')
-        .withCreatedAt((index) => new Date(new Date().getTime() + index))
-        .build();
+    describe('should return categories using empty query with categories ordered by created_at', () => {
+      const { entitiesMap, arrange } =
+        ListCategoriesFixture.arrangeIncrementedWithCreatedAt();
 
-      await repository.bulkInsert(categories);
+      beforeEach(async () => {
+        await repository.bulkInsert(Object.values(entitiesMap));
+      });
 
-      const arrange = [
-        {
-          send_data: {},
-          expected: {
-            items: [categories[3], categories[2], categories[1], categories[0]],
-            current_page: 1,
-            last_page: 1,
-            per_page: 15,
-            total: 4,
-          },
-        },
-        {
-          send_data: { per_page: 2 },
-          expected: {
-            items: [categories[3], categories[2]],
-            current_page: 1,
-            last_page: 2,
-            per_page: 2,
-            total: 4,
-          },
-        },
-        {
-          send_data: { page: 2, per_page: 2 },
-          expected: {
-            items: [categories[1], categories[0]],
-            current_page: 2,
-            last_page: 2,
-            per_page: 2,
-            total: 4,
-          },
-        },
-      ];
+      test.each(arrange)('when $send_data', async ({ send_data, expected }) => {
+        const { entities, meta } = expected;
 
-      for (const item of arrange) {
-        const presenter = await controller.search(item.send_data);
+        const presenter = await controller.search(send_data);
+
         expect(presenter).toEqual(
-          new CategoryCollectionPresenter(item.expected),
+          new CategoryCollectionPresenter({
+            items: entities,
+            ...meta,
+          }),
         );
-      }
+      });
     });
 
-    test('should returns output using pagination, sort and filter', async () => {
-      const faker = Category.fake().aCategory();
-      const categories = [
-        faker.withName('a').build(),
-        faker.withName('AAA').build(),
-        faker.withName('AaA').build(),
-        faker.withName('b').build(),
-        faker.withName('c').build(),
-      ];
-      await repository.bulkInsert(categories);
+    describe('should returns output using pagination, sort and filter', () => {
+      const { entitiesMap, arrange } = ListCategoriesFixture.arrangeUnsorted();
 
-      const arrange_asc = [
-        {
-          send_data: {
-            page: 1,
-            per_page: 2,
-            sort: 'name',
-            filter: 'a',
-          },
-          expected: {
-            items: [categories[1], categories[2]],
-            current_page: 1,
-            last_page: 2,
-            per_page: 2,
-            total: 3,
-          },
-        },
-        {
-          send_data: {
-            page: 2,
-            per_page: 2,
-            sort: 'name',
-            filter: 'a',
-          },
-          expected: {
-            items: [categories[0]],
-            current_page: 2,
-            last_page: 2,
-            per_page: 2,
-            total: 3,
-          },
-        },
-      ];
+      beforeEach(async () => {
+        await repository.bulkInsert(Object.values(entitiesMap));
+      });
 
-      for (const item of arrange_asc) {
-        const presenter = await controller.search(item.send_data);
+      test.each(arrange)('when $send_data', async ({ send_data, expected }) => {
+        const { entities, meta } = expected;
+
+        const presenter = await controller.search(send_data);
+
         expect(presenter).toEqual(
-          new CategoryCollectionPresenter(item.expected),
+          new CategoryCollectionPresenter({
+            items: entities,
+            ...meta,
+          }),
         );
-      }
-
-      const arrange_desc = [
-        {
-          send_data: {
-            page: 1,
-            per_page: 2,
-            sort: 'name',
-            sort_dir: 'desc' as SortDirection,
-            filter: 'a',
-          },
-          expected: {
-            items: [categories[0], categories[2]],
-            current_page: 1,
-            last_page: 2,
-            per_page: 2,
-            total: 3,
-          },
-        },
-        {
-          send_data: {
-            page: 2,
-            per_page: 2,
-            sort: 'name',
-            sort_dir: 'desc' as SortDirection,
-            filter: 'a',
-          },
-          expected: {
-            items: [categories[1]],
-            current_page: 2,
-            last_page: 2,
-            per_page: 2,
-            total: 3,
-          },
-        },
-      ];
-
-      for (const item of arrange_desc) {
-        const presenter = await controller.search(item.send_data);
-        expect(presenter).toEqual(
-          new CategoryCollectionPresenter(item.expected),
-        );
-      }
+      });
     });
   });
 });

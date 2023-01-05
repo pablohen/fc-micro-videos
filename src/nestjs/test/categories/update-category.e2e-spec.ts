@@ -10,7 +10,7 @@ import { UpdateCategoryFixture } from '../../src/categories/fixtures';
 describe('CategoriesController (e2e)', () => {
   const uuid = 'e0839f2e-866c-4569-89fa-b08319688451';
 
-  describe('PUT /categories/:id', () => {
+  describe('/categories/:id (PUT)', () => {
     describe('should send an error when id is invalid or not found', () => {
       const nestApp = startApp();
       const faker = Category.fake().aCategory();
@@ -122,7 +122,7 @@ describe('CategoriesController (e2e)', () => {
             .send(send_data)
             .expect(200);
 
-          const keysInResponse = UpdateCategoryFixture.keysInCategoryResponse();
+          const keysInResponse = UpdateCategoryFixture.keysInResponse();
           expect(Object.keys(res.body)).toStrictEqual(['data']);
           expect(Object.keys(res.body.data)).toStrictEqual(keysInResponse);
 
