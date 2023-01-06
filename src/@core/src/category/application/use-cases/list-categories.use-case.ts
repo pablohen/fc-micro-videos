@@ -23,11 +23,15 @@ export namespace ListCategoriesUseCase {
     }
 
     private toOutput(searchResult: CategoryRepository.SearchResult): Output {
-      const items = searchResult.items.map((i) => {
-        return CategoryOutputMapper.toOutput(i);
+      const { items: _items, filter, sort, ...otherProps } = searchResult;
+      const items = _items.map((category) => {
+        return CategoryOutputMapper.toOutput(category);
       });
 
-      return PaginationOutputMapper.toOutput(items, searchResult);
+      return PaginationOutputMapper.toOutput({
+        items,
+        ...otherProps,
+      });
     }
   }
 }

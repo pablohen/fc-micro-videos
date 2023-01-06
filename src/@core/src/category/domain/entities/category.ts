@@ -13,7 +13,9 @@ export interface CategoryProps {
 
 type Update = Pick<Required<CategoryProps>, "name" | "description">;
 
-export class Category extends Entity<CategoryProps> {
+export type CategoryPropsJson = Required<{ id: string } & CategoryProps>;
+
+export class Category extends Entity<CategoryProps, CategoryPropsJson> {
   constructor(public readonly props: CategoryProps, id?: UniqueEntityId) {
     Category.validate(props);
 
@@ -51,16 +53,6 @@ export class Category extends Entity<CategoryProps> {
     return this.props.created_at;
   }
 
-  update({ name, description }: Update) {
-    Category.validate({
-      name,
-      description,
-    });
-
-    this.name = name;
-    this.description = description;
-  }
-
   static validate(props: Omit<CategoryProps, "created_at">) {
     const validator = CategoryValidatorFactory.create();
     const isValid = validator.validate(props);
@@ -74,14 +66,15 @@ export class Category extends Entity<CategoryProps> {
     return CategoryFakeBuilder;
   }
 
-  // static validate(props: Omit<CategoryProps, "created_at">) {
-  //   ValidatorRules.values(props.name, "name")
-  //     .required()
-  //     .string()
-  //     .maxLength(255);
-  //   ValidatorRules.values(props.description, "description").string();
-  //   ValidatorRules.values(props.is_active, "is_active").boolean();
-  // }
+  update({ name, description }: Update) {
+    Category.validate({
+      name,
+      description,
+    });
+
+    this.name = name;
+    this.description = description;
+  }
 
   activate() {
     this.props.is_active = true;
@@ -89,5 +82,15 @@ export class Category extends Entity<CategoryProps> {
 
   deactivate() {
     this.props.is_active = false;
+  }
+
+  toJSON(): CategoryPropsJson {
+    return {
+      id: this.id.toString(),
+      name: this.name,
+      description: this.description,
+      is_active: this.is_active,
+      created_at: this.created_at,
+    };
   }
 }

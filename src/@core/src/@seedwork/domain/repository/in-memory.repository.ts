@@ -11,9 +11,6 @@ import {
 export abstract class InMemoryRepository<E extends Entity>
   implements RepositoryInterface<E>
 {
-  bulkInsert(entities: E[]): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
   items: E[] = [];
 
   async insert(entity: E): Promise<void> {
@@ -56,11 +53,18 @@ export abstract class InMemoryRepository<E extends Entity>
 
     return item;
   }
+
+  bulkInsert(entities: E[]): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
 
-export abstract class InMemorySearchableRepository<E extends Entity>
+export abstract class InMemorySearchableRepository<
+    E extends Entity,
+    Filter = string
+  >
   extends InMemoryRepository<E>
-  implements SearchableRepositoryInterface<E, any, any>
+  implements SearchableRepositoryInterface<E, Filter>
 {
   sortableFields: string[];
 
@@ -68,7 +72,7 @@ export abstract class InMemorySearchableRepository<E extends Entity>
     this.items.push(...entities);
   }
 
-  async search(props: SearchParams): Promise<SearchResult<E>> {
+  async search(props: SearchParams<Filter>): Promise<SearchResult<E, Filter>> {
     const itemsFiltered = await this.applyFilter(this.items, props.filter);
     const itemsSorted = await this.applySort(
       itemsFiltered,
@@ -94,24 +98,28 @@ export abstract class InMemorySearchableRepository<E extends Entity>
 
   protected abstract applyFilter(
     items: E[],
-    filter: string | null
+    filter: Filter | null
   ): Promise<E[]>;
 
   protected async applySort(
     items: E[],
     sort: string | null,
-    sort_dir: string | null
+    sort_dir: string | null,
+    custom_getter?: (sort: string, item: E) => any
   ): Promise<E[]> {
     if (!sort || !this.sortableFields.includes(sort)) {
       return items;
     }
 
     return [...items].sort((a, b) => {
-      if (a.props[sort] < b.props[sort]) {
+      const aValue = custom_getter ? custom_getter(sort, a) : a.props[sort];
+      const bValue = custom_getter ? custom_getter(sort, b) : b.props[sort];
+
+      if (aValue < bValue) {
         return sort_dir === "asc" ? -1 : 1;
       }
 
-      if (a.props[sort] > b.props[sort]) {
+      if (aValue > bValue) {
         return sort_dir === "asc" ? 1 : -1;
       }
 
