@@ -27,6 +27,7 @@ describe("ListCategoriesUseCase Unit Tests", () => {
     });
 
     const output = useCase["toOutput"](result);
+    console.log(output);
     expect(output).toStrictEqual({
       items: [entity.toJSON()],
       total: 1,

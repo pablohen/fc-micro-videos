@@ -13,25 +13,20 @@ export namespace ListCategoriesUseCase {
   export type Output = PaginationOutputDto<CategoryOutput>;
 
   export class UseCase implements DefaultUseCase<Input, Output> {
-    constructor(private categoryRepository: CategoryRepository.Repository) {}
-
+    constructor(private categoryRepo: CategoryRepository.Repository) {}
+    //
     async execute(input: Input): Promise<Output> {
       const params = new CategoryRepository.SearchParams(input);
-      const searchResult = await this.categoryRepository.search(params);
-
+      const searchResult = await this.categoryRepo.search(params);
       return this.toOutput(searchResult);
     }
 
     private toOutput(searchResult: CategoryRepository.SearchResult): Output {
-      const { items: _items, filter, sort, ...otherProps } = searchResult;
-      const items = _items.map((category) => {
-        return CategoryOutputMapper.toOutput(category);
+      const { items: _items } = searchResult;
+      const items = _items.map((i) => {
+        return CategoryOutputMapper.toOutput(i);
       });
-
-      return PaginationOutputMapper.toOutput({
-        items,
-        ...otherProps,
-      });
+      return PaginationOutputMapper.toOutput(items, searchResult);
     }
   }
 }

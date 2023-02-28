@@ -1,3 +1,5 @@
+import { SearchResult } from "../../domain";
+
 export type PaginationOutputDto<Item = any> = {
   items: Item[];
   total: number;
@@ -6,20 +8,21 @@ export type PaginationOutputDto<Item = any> = {
   per_page: number;
 };
 
-export type PaginationOutputProps<Item> = {
-  items: Item[];
-  total: number;
-  current_page: number;
-  last_page: number;
-  per_page: number;
-};
+// export type PaginationOutputProps<Item> = {
+//   items: Item[];
+//   total: number;
+//   current_page: number;
+//   last_page: number;
+//   per_page: number;
+// };
 
 export class PaginationOutputMapper {
-  static toOutput<Item = any>(
-    props: PaginationOutputProps<Item>
+  static toOutput<Item = any, Filter = any>(
+    items: Item[],
+    props: SearchResult<any, Filter>
   ): PaginationOutputDto<Item> {
     return {
-      items: props.items,
+      items,
       total: props.total,
       current_page: props.current_page,
       last_page: props.last_page,

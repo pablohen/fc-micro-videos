@@ -4,3 +4,4 @@ __coverage
 docker-compose.override.yml
 node_modules/
 tsconfig.tsbuildinfo
+tmp

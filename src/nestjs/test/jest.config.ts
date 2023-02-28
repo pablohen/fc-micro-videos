@@ -11,9 +11,13 @@ export default {
   moduleNameMapper: {
     '@fc/micro\\-videos/(.*)$':
       '<rootDir>/../../../node_modules/@fc/micro-videos/dist/$1',
+    //TODO - vamos ver depois
     '#seedwork/(.*)$':
       '<rootDir>/../../../node_modules/@fc/micro-videos/dist/@seedwork/$1',
+    //TODO - vamos ver depois
     '#category/(.*)$':
       '<rootDir>/../../../node_modules/@fc/micro-videos/dist/category/$1',
+    '#cast-member/(.*)$':
+      '<rootDir>/../../../node_modules/@fc/micro-videos/dist/cast-member/$1',
   },
 };

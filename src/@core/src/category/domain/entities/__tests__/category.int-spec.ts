@@ -67,9 +67,7 @@ describe("Category Integration Tests", () => {
     test("should throw validation error when name is invalid", () => {
       const category = new Category({ name: "Movie" });
 
-      expect(() =>
-        category.update({ name: null, description: null })
-      ).containsErrorMessages({
+      expect(() => category.update(null, null)).containsErrorMessages({
         name: [
           "name should not be empty",
           "name must be a string",
@@ -77,12 +75,10 @@ describe("Category Integration Tests", () => {
         ],
       });
 
-      expect(() =>
-        category.update({ name: "", description: null })
-      ).containsErrorMessages({ name: ["name should not be empty"] });
-      expect(() =>
-        category.update({ name: 5 as any, description: null })
-      ).containsErrorMessages({
+      expect(() => category.update("", null)).containsErrorMessages({
+        name: ["name should not be empty"],
+      });
+      expect(() => category.update(5 as any, null)).containsErrorMessages({
         name: [
           "name must be a string",
           "name must be shorter than or equal to 255 characters",
@@ -90,7 +86,7 @@ describe("Category Integration Tests", () => {
       });
 
       expect(() =>
-        category.update({ name: "t".repeat(256), description: null })
+        category.update("t".repeat(256), null)
       ).containsErrorMessages({
         name: ["name must be shorter than or equal to 255 characters"],
       });
@@ -100,7 +96,7 @@ describe("Category Integration Tests", () => {
       const category = new Category({ name: "Movie" });
 
       expect(() =>
-        category.update({ name: "Updated Movie", description: 5 as any })
+        category.update("Updated Movie", 5 as any)
       ).containsErrorMessages({
         description: ["description must be a string"],
       });
@@ -110,8 +106,8 @@ describe("Category Integration Tests", () => {
       expect.assertions(0);
       const category = new Category({ name: "Movie" });
 
-      category.update({ name: "Movie", description: "description" });
-      category.update({ name: "Movie", description: null });
+      category.update("Movie", "description");
+      category.update("Movie", null);
     });
   });
 });

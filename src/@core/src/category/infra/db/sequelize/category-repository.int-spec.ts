@@ -402,7 +402,7 @@ describe("CategoryRepository Tests", () => {
     const entity = new Category({ name: "Movie" });
     await repository.insert(entity);
 
-    entity.update({ name: "Movie updated", description: entity.description });
+    entity.update("Movie updated", entity.description);
     await repository.update(entity);
 
     const entityFound = await repository.findById(entity.id);

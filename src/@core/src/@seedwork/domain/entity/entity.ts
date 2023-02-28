@@ -10,9 +10,13 @@ export abstract class Entity<
     this.uniqueEntityId = id || new UniqueEntityId();
   }
 
-  get id() {
+  get id(): string {
     return this.uniqueEntityId.value;
   }
+
+  // equals(obj: this): boolean {
+  //   return this.id === obj.id;
+  // }
 
   abstract toJSON(): JsonProps;
 }

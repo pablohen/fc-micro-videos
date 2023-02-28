@@ -6,7 +6,7 @@ import { MigrationModule } from '../src/database/migration/migration.module';
 
 describe('Migrate (e2e)', () => {
   let umzug: Umzug;
-  const totalMigrations = 1; // TODO: change this dynamically later
+  const totalMigrations = 2;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -18,13 +18,13 @@ describe('Migrate (e2e)', () => {
     umzug = migrator(sequelize, { logger: undefined });
   });
 
-  test('should exec up command', async () => {
+  test('up command', async () => {
     await umzug.down({ to: 0 as any });
     const result = await umzug.up();
     expect(result).toHaveLength(totalMigrations);
   });
 
-  test('should exec down command', async () => {
+  test('down command', async () => {
     await umzug.up();
     const result = await umzug.down({ to: 0 as any });
     expect(result).toHaveLength(totalMigrations);

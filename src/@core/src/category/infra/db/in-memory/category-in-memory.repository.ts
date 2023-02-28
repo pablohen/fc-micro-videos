@@ -1,9 +1,12 @@
-import { Category, CategoryProps } from "category/domain/entities/category";
+import {
+  Category,
+  CategoryProperties,
+} from "category/domain/entities/category";
 import { CategoryRepository } from "category/domain/repository/category.repository";
 import { InMemorySearchableRepository } from "../../../../@seedwork/domain/repository/in-memory.repository";
 import { SortDirection } from "../../../../@seedwork/domain/repository/repository-contracts";
 
-export type CategorySortableFields = keyof CategoryProps;
+export type CategorySortableFields = keyof CategoryProperties;
 
 export class CategoryInMemoryRepository
   extends InMemorySearchableRepository<Category>

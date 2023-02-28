@@ -2,7 +2,7 @@ import {
   CategoryRules,
   CategoryValidator,
   CategoryValidatorFactory,
-} from "./category-validator";
+} from "./category.validator";
 
 interface ArrangeTest {
   name: string;

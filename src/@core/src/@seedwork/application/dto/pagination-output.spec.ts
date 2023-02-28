@@ -2,8 +2,8 @@ import { SearchResult } from "../../domain/repository/repository-contracts";
 import { PaginationOutputMapper } from "./pagination-output";
 
 describe("PaginationOutputMapper Unit Tests", () => {
-  test("should convert a SearchResult in output", async () => {
-    const searchResult = new SearchResult({
+  it("should convert a SearchResult in output", () => {
+    const result = new SearchResult({
       items: ["fake"] as any,
       total: 1,
       current_page: 1,
@@ -12,17 +12,13 @@ describe("PaginationOutputMapper Unit Tests", () => {
       sort_dir: "desc",
       filter: "fake",
     });
-
-    const output = PaginationOutputMapper.toOutput({
-      items: searchResult.items,
-      ...searchResult,
-    });
+    const output = PaginationOutputMapper.toOutput(result.items, result);
     expect(output).toStrictEqual({
       items: ["fake"],
       total: 1,
       current_page: 1,
-      per_page: 1,
       last_page: 1,
+      per_page: 1,
     });
   });
 });
